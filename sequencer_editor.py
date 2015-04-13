@@ -102,7 +102,7 @@ class SequencerEditor(Tkinter.Toplevel):
         self.button_grid.buttons[beat][sample].set_state(state)
 
     def set_current_beat(self, current_beat):
-        for beat, header_element in self.header.header_elements:
+        for beat, header_element in enumerate(self.header.header_elements):
             if (beat == current_beat):
                 header_element.set_state(True)
             else:

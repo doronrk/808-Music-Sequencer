@@ -7,6 +7,9 @@ class Observable(object):
     def add_callback(self, func):
         self.callbacks.append(func)
 
+    def notify(self):
+        self._do_callbacks()
+
     def set_value(self, new_value):
         self.value = new_value
         self._do_callbacks()
