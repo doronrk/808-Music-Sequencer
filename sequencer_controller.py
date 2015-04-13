@@ -1,4 +1,6 @@
 import sys
+import threading
+import time
 from os import listdir
 from sequencer_model import *
 from sequencer_editor import *
@@ -16,6 +18,8 @@ class SequencerController(object):
         
         self.sequencer_editor = SequencerEditor(root, SequencerController.DEFAULT_N_BEATS, number_samples)
         self.sequencer_editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
+        self.sequencer_editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
+
         #self.sequencer_audio = SequencerAudio()
 
 
@@ -23,6 +27,10 @@ class SequencerController(object):
         position = event.widget.position
         new_state = self.sequencer_model.toggle_button(position)
         self.sequencer_editor.set_button_state(position, new_state)
+
+    def playback_click_handler(self, event):
+        playback_state = self.sequencer_model.toggle_playback()
+        self.sequencer_editor.set_playback_state(playback_state)
 
 if __name__ == "__main__":
     sample_folder_path = sys.argv[1]

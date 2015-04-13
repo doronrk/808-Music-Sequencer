@@ -11,11 +11,11 @@ class SequencerModel(object):
 
     def __init__(self, number_samples, number_beats, bpm):
         self.number_samples = number_samples
-        self.number_beats = Observable(number_beats)
         self.buttons = [[False for sample in range(number_samples)] for beat in range(number_beats)]
+        self.playback_state = False
         self.bpm = Observable(bpm)
+        self.number_beats = Observable(number_beats)
         self.current_beat = Observable(0)
-        self.playback_on = Observable(False)
 
     def toggle_button(self, position):
         #TODO, out of bounds exception
@@ -23,6 +23,10 @@ class SequencerModel(object):
         button_state = self.buttons[beat][sample]
         self.buttons[beat][sample] = not button_state
         return self.buttons[beat][sample]
+
+    def toggle_playback(self):
+        self.playback_state = not self.playback_state
+        return self.playback_state
 
     def set_bpm(self, bpm):
         #TODO error checking
@@ -34,25 +38,23 @@ class SequencerModel(object):
     def set_current_beat(self, current_beat):
         self.current_beat.set_value(current_beat)
 
-    def set_playback(self, playback_value):
-        self.playback_on.set_value(playback_value)
 
 
-    # def step_worker(self):
-    #     while(self.playback_on):
-    #         print('current_beat ' + str(self.current_beat))
-    #         self.audio.play_samples(self.grid[self.current_beat])
-    #         seconds_per_beat = bpm_to_seconds_per_beat(self.bpm)
-    #         time.sleep(seconds_per_beat)
-    #         self.current_beat = self.current_beat + 1
+    def step_worker(self):
+        while(self.playback_on):
+            print('current_beat ' + str(self.current_beat))
+            self.audio.play_samples(self.grid[self.current_beat])
+            seconds_per_beat = bpm_to_seconds_per_beat(self.bpm)
+            time.sleep(seconds_per_beat)
+            self.current_beat = self.current_beat + 1
 
-    # def set_playback(self, state):
-    #     if (self.playback_on == state):
-    #         return
-    #     self.playback_on = state
-    #     if (state):
-    #         self.start_playback()
+    def set_playback(self, state):
+        if (self.playback_on == state):
+            return
+        self.playback_on = state
+        if (state):
+            self.start_playback()
 
-    # def start_playback(self):
-    #     t = threading.Thread(target=self.step_worker)
-    #     t.start()
+    def start_playback(self):
+        t = threading.Thread(target=self.step_worker)
+        t.start()
