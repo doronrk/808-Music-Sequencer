@@ -1,0 +1,14 @@
+Architecture is MVC where there are essentially two "viewers", audio output and 
+the sequencer GUI that observe the state of the model via the observer pattern.
+
+the controller has a thread that updates the current beat, triggering a callback
+to update the GUI current beat as well as a callback to trigger audio out for 
+any active samples
+
+clicks on the grid trigger a callback to the controller which updates the model
+the observables in the model trigger a listening callback in the controller which
+updates the GUI 
+
+
+Thoughts:
+    - wondering where the logic for updating the current beat should live, controller or model
