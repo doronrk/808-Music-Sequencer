@@ -46,6 +46,9 @@ class SequencerModel(object):
                 else:
                     self.current_beat.set_value(current_beat_value + 1)
 
+    def get_sample_states_for_beat(self, beat):
+        return self.buttons[beat]
+
     # def set_bpm(self, bpm):
     #     #TODO error checking
     #     self.bpm.set_value(bpm)

@@ -21,7 +21,7 @@ class SequencerController(object):
         self.sequencer_editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
         self.sequencer_editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
 
-        #self.sequencer_audio = SequencerAudio()
+        self.sequencer_audio = SequencerAudio(path_directory)
 
     def sequencer_click_handler(self, event):
         position = event.widget.position
@@ -34,6 +34,9 @@ class SequencerController(object):
 
     def beat_update_handler(self, current_beat):
         self.sequencer_editor.set_current_beat(current_beat)
+        sample_states = self.sequencer_model.get_sample_states_for_beat(current_beat)
+        self.sequencer_audio.play_samples(sample_states)
+
 
 if __name__ == "__main__":
     sample_folder_path = sys.argv[1]
