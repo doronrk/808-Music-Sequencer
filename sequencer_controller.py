@@ -11,9 +11,8 @@ class SequencerController(object):
     DEFAULT_N_BEATS = 8
     DEFAULT_BPM = 60.0
 
-    def __init__(self, root, sample_folder_path):
-        path_directory = listdir(sample_folder_path)
-        number_samples = len(path_directory)
+    def __init__(self, root, sample_files):
+        number_samples = len(sample_files)
         self.sequencer_model = SequencerModel(number_samples, SequencerController.DEFAULT_N_BEATS, SequencerController.DEFAULT_BPM)
         self.sequencer_model.current_beat.add_callback(self.beat_update_handler)
 
@@ -21,7 +20,7 @@ class SequencerController(object):
         self.sequencer_editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
         self.sequencer_editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
 
-        self.sequencer_audio = SequencerAudio(path_directory)
+        self.sequencer_audio = SequencerAudio(sample_files)
 
     def sequencer_click_handler(self, event):
         position = event.widget.position
@@ -40,9 +39,11 @@ class SequencerController(object):
 
 if __name__ == "__main__":
     sample_folder_path = sys.argv[1]
+    files_in_sample_folder = listdir(sample_folder_path)
+    wav_files_in_sample_folder = [sample_folder_path + '/' + sample for sample in files_in_sample_folder if sample[-4:] == '.wav']
     root = Tkinter.Tk()
     root.withdraw()
-    app = SequencerController(root, sample_folder_path)
+    app = SequencerController(root, wav_files_in_sample_folder)
     root.title("Sequencer")
     #root.resizable(height=True, width=True)
     root.mainloop()
