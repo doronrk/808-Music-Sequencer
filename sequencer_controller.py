@@ -9,20 +9,30 @@ DEFAULT_N_BEATS = 8
 DEFAULT_BPM = 135.0
 
 class SequencerController(object):
-
+    """The SequencerController updates the SequencerModel according to GUI events
+    and updates Audio/Console output and the GUI when the current beat changes
+    """
 
     def __init__(self, root, sample_files, using_audio_out):
+        """
+        root - main GUI window
+        sample_files - list of relative paths to samples
+        using_audio_out - True if pygame dependency supported, False otherwise
+        """
+        
         self.sequencer_model = SequencerModel(len(sample_files), DEFAULT_N_BEATS, DEFAULT_BPM)
         self.sequencer_model.current_beat.add_callback(self.beat_update_handler)
 
+        # remove relative path and .wav from filenames
         sample_names = [sample_file[:-4].split('/', 1)[1] for sample_file in sample_files]
         self.sequencer_editor = SequencerEditor(root, DEFAULT_N_BEATS, sample_names, DEFAULT_BPM)
+        # binds callbacks with corresponding GUI elements 
         self.sequencer_editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
         self.sequencer_editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
         self.sequencer_editor.transport_bar.bpm_setter.bind("<Button-1>", self.bpm_setter_click_handler)
         self.sequencer_editor.transport_bar.number_beats_setter.bind("<Button-1>", self.number_beats_setter_click_handler)
         self.sequencer_editor.sample_boxes.bind("<Button-1>", self.sample_box_click_handler)
-        
+        # intializes audio output if dependencies available, console output otherwise
         self.sequencer_audio = SequencerAudio(sample_files) if using_audio_out else SequencerConsoleOutput(sample_names)
 
     def sequencer_click_handler(self, event):
