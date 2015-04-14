@@ -3,7 +3,6 @@ import time
 from observable import *
 
 def bpm_to_seconds_per_beat(bpm):
-    # TODO error handling for 0.0 and negatives
     minutes_per_beat = 1.0 / bpm
     return minutes_per_beat * 60.0
 
@@ -14,11 +13,10 @@ class SequencerModel(object):
         self.buttons = [[False for sample in range(number_samples)] for beat in range(number_beats)]
         self.playback_state = False
         self.bpm = bpm
-        self.number_beats = Observable(number_beats)
+        self.number_beats = number_beats
         self.current_beat = Observable(0)
 
     def toggle_button(self, position):
-        #TODO, out of bounds exception
         beat, sample = position
         button_state = self.buttons[beat][sample]
         self.buttons[beat][sample] = not button_state
@@ -41,7 +39,7 @@ class SequencerModel(object):
             seconds_per_beat = bpm_to_seconds_per_beat(self.bpm)
             time.sleep(seconds_per_beat)
             if (self.playback_state): # check to see if playback stopped while sleeping
-                if (current_beat_value >= self.number_beats.get_value() - 1):
+                if (current_beat_value >= self.number_beats - 1):
                     self.current_beat.set_value(0)
                 else:
                     self.current_beat.set_value(current_beat_value + 1)
@@ -52,6 +50,14 @@ class SequencerModel(object):
     def set_bpm(self, bpm):
         self.bpm = bpm
 
-    def set_number_beats(self, n_beats):
-        self.number_beats.set_value(n_beats)
+    def set_number_beats(self, new_number_beats):
+        if new_number_beats - 1 < self.current_beat.get_value():
+            self.current_beat.set_value(0)
+        diff = new_number_beats - self.number_beats
+        if diff > 0:
+            for i in range(diff):
+                self.buttons.append([False for sample in range(self.number_samples)])
+        else:
+            self.buttons = self.buttons[:new_number_beats]
+        self.number_beats = new_number_beats
     

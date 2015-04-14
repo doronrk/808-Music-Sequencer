@@ -21,6 +21,7 @@ class SequencerController(object):
         self.sequencer_editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
         self.sequencer_editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
         self.sequencer_editor.transport_bar.bpm_setter.bind("<Button-1>", self.bpm_setter_click_handler)
+        self.sequencer_editor.transport_bar.number_beats_setter.bind("<Button-1>", self.number_beats_setter_click_handler)
         self.sequencer_editor.sample_boxes.bind("<Button-1>", self.sample_box_click_handler)
         
         self.sequencer_audio = SequencerAudio(sample_files)
@@ -49,6 +50,17 @@ class SequencerController(object):
             return
         self.sequencer_model.set_bpm(new_bpm)
 
+    def number_beats_setter_click_handler(self, event):
+        entry = self.sequencer_editor.transport_bar.number_beats_entry.get()
+        new_number_beats = None
+        try:
+            new_number_beats = int(entry)
+        except ValueError:
+            return
+        if (new_number_beats < 1):
+            return
+        self.sequencer_model.set_number_beats(new_number_beats)
+        self.sequencer_editor.set_number_beats(new_number_beats)
 
     def beat_update_handler(self, current_beat):
         self.sequencer_editor.set_current_beat(current_beat)
