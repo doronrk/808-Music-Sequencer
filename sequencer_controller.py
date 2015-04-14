@@ -68,6 +68,20 @@ class SequencerController(object):
 
 
 if __name__ == "__main__":
+    if not len(sys.argv) == 2:
+        print 'usage: python sequencer_controller.py [relative_path_to_sample_folder]'
+        sys.exit()
+    sample_folder_path = sys.argv[1]
+    try:
+        files_in_sample_folder = listdir(sample_folder_path)
+    except OSError:
+        print 'Could not locate sample folder'
+        sys.exit()
+    wav_files_in_sample_folder = [sample_folder_path + '/' + sample for sample in files_in_sample_folder if sample[-4:] == '.wav']
+    if len(wav_files_in_sample_folder) == 0:
+        print 'Could not locate any .wav files in the sample folder'
+        sys.exit()
+
     using_audio_out = True
     try:
         from sequencer_audio import *
@@ -77,9 +91,7 @@ if __name__ == "__main__":
         from sequencer_console_output import *
         print 'Pygame audio not supported, outputting sample names to console'
         print 'Please install Pygame for audio out'
-    sample_folder_path = sys.argv[1]
-    files_in_sample_folder = listdir(sample_folder_path)
-    wav_files_in_sample_folder = [sample_folder_path + '/' + sample for sample in files_in_sample_folder if sample[-4:] == '.wav']
+
     root = Tkinter.Tk()
     root.withdraw()
     app = SequencerController(root, wav_files_in_sample_folder, using_audio_out)
