@@ -50,5 +50,4 @@ if __name__ == "__main__":
     root.withdraw()
     app = SequencerController(root, wav_files_in_sample_folder)
     root.title("Sequencer")
-    #root.resizable(height=True, width=True)
     root.mainloop()

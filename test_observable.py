@@ -38,5 +38,15 @@ class Tests(unittest.TestCase):
         self.assertTrue(o.get_value() == 5)
         self.assertTrue(l == [5, 10, 15])
 
+    def test_notify(self):
+        o = Observable(0)
+        l = []
+        def callback(value):
+            l.append(value)
+        o.add_callback(callback)
+        o.notify()
+        self.assertTrue(o.get_value() == 0)
+        self.assertTrue(l == [0])
+
 if __name__ == '__main__':
     unittest.main()
