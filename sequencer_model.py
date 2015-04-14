@@ -8,7 +8,8 @@ def bpm_to_seconds_per_beat(bpm):
     return minutes_per_beat * 60.0
 
 class SequencerModel(object):
-
+    """This class stores the state of the sequencer"""
+    
     def __init__(self, number_samples, number_beats, bpm):
         self.number_samples = number_samples
         # number of beats by number of samples list representing the state of each button 
