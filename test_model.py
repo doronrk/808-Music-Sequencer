@@ -21,6 +21,32 @@ class Tests(unittest.TestCase):
         states = model.get_sample_states_for_beat(0)
         self.assertEquals(set([False]), set(states))
 
+    def test_set_number_beats_increase(self):
+        model = SequencerModel(8, 8, 120.0)
+        model.set_number_beats(10)
+        self.assertTrue(model.number_beats == 10)
+        for beat in range(10):
+            for sample in range(8):
+                position = (beat, sample)
+                self.assertFalse(model.buttons[beat][sample])
+
+    def test_set_number_beats_decrease(self):
+        model = SequencerModel(8, 8, 120.0)
+        model.set_number_beats(4)
+        self.assertTrue(model.number_beats == 4)
+        for beat in range(4):
+            for sample in range(8):
+                position = (beat, sample)
+                self.assertFalse(model.buttons[beat][sample])
+
+    def test_set_number_beats_keep_button_states(self):
+        model = SequencerModel(8, 8, 120.0)
+        for sample in range(4, 8):
+            model.toggle_button((3, sample))
+        model.set_number_beats(10)
+        states = model.get_sample_states_for_beat(3)
+        self.assertEquals(set([False]), set(states[0:4]))
+        self.assertEquals(set([True]), set(states[4:]))
 
     def test_playback_constant_bpm(self):
         timing_tolerance = .1 # this is the propertion of one beat duration in which timing deviation is tolerated
