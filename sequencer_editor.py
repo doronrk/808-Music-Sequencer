@@ -1,6 +1,7 @@
 import Tkinter
 
-DEFAULT_SQAURE_DIMENSION = 100
+DEFAULT_NOTE_DIMENSION = 100
+DEFAULT_TRANSPORT_DIMENSION = DEFAULT_NOTE_DIMENSION / 2.0
 OFFSET_DISTANCE = 10
 
 
@@ -9,7 +10,7 @@ class TwoColorBox(Tkinter.Canvas):
     COLOR_EMPTY = "white"
     COLOR_FILLED = "gray50"
 
-    def __init__(self, master, width=DEFAULT_SQAURE_DIMENSION, height=DEFAULT_SQAURE_DIMENSION):
+    def __init__(self, master, width=DEFAULT_NOTE_DIMENSION, height=DEFAULT_NOTE_DIMENSION):
         Tkinter.Canvas.__init__(self, master, width=width, height=height,
             background=TwoColorBox.COLOR_EMPTY, highlightthickness=1,
             highlightbackground="black")
@@ -54,14 +55,13 @@ class Header(Tkinter.Frame):
 class PlaybackButton(Tkinter.Canvas):
 
     def __init__(self, master):
-        self.dimension = DEFAULT_SQAURE_DIMENSION/2.0
-        Tkinter.Canvas.__init__(self, master, width=self.dimension, height=self.dimension
+        Tkinter.Canvas.__init__(self, master, width=DEFAULT_TRANSPORT_DIMENSION, height=DEFAULT_TRANSPORT_DIMENSION
                                 , highlightthickness=1, highlightbackground="black")
         self.rect_coords = (OFFSET_DISTANCE, OFFSET_DISTANCE,
-                            self.dimension - OFFSET_DISTANCE, self.dimension - OFFSET_DISTANCE)
+                            DEFAULT_TRANSPORT_DIMENSION - OFFSET_DISTANCE, DEFAULT_TRANSPORT_DIMENSION - OFFSET_DISTANCE)
         self.tri_coords = (OFFSET_DISTANCE, OFFSET_DISTANCE, 
-                           OFFSET_DISTANCE, self.dimension - OFFSET_DISTANCE,
-                           self.dimension - OFFSET_DISTANCE, self.dimension/2.0)
+                           OFFSET_DISTANCE, DEFAULT_TRANSPORT_DIMENSION - OFFSET_DISTANCE,
+                           DEFAULT_TRANSPORT_DIMENSION - OFFSET_DISTANCE, DEFAULT_TRANSPORT_DIMENSION/2.0)
         self.set_state(False)
 
     def set_state(self, state):
@@ -77,18 +77,28 @@ class PlaybackButton(Tkinter.Canvas):
 
 class TransportBar(Tkinter.Frame):
 
-    def __init__(self, master):
+    def __init__(self, master, bpm):
         Tkinter.Frame.__init__(self, master)
         self.playback_button = PlaybackButton(self)
-        self.playback_button.grid()
+        self.playback_button.grid(row=0, column=0, padx=1, pady=1)
+
+        self.bpm_entry = Tkinter.Entry(self)
+        self.bpm_entry.grid(row=0, column=1, padx=1, pady=1)
+        self.bpm_entry.insert(0, str(bpm))
+        self.bpm_setter = Tkinter.Canvas(self, width=DEFAULT_TRANSPORT_DIMENSION, 
+                                      height=DEFAULT_TRANSPORT_DIMENSION, highlightthickness=1, 
+                                      highlightbackground="black")
+        self.bpm_setter.create_text((DEFAULT_TRANSPORT_DIMENSION/2.0,DEFAULT_TRANSPORT_DIMENSION/2.0), text='set bpm')
+        self.bpm_setter.grid(row=0, column=2, padx=1, pady=1)
+        # self.bpm_set(row=0, column=2, padx=1, pady=1)
 
 class SampleBoxes(Tkinter.Frame):
 
     def __init__(self, master, sample_names):
         Tkinter.Frame.__init__(self, master)
         for n, sample_name in enumerate(sample_names):
-            sample_box = Tkinter.Canvas(self, width=DEFAULT_SQAURE_DIMENSION, height=DEFAULT_SQAURE_DIMENSION)
-            sample_box.create_text((DEFAULT_SQAURE_DIMENSION/2.0,DEFAULT_SQAURE_DIMENSION/2.0), text=sample_name)
+            sample_box = Tkinter.Canvas(self, width=DEFAULT_NOTE_DIMENSION, height=DEFAULT_NOTE_DIMENSION)
+            sample_box.create_text((DEFAULT_NOTE_DIMENSION/2.0,DEFAULT_NOTE_DIMENSION/2.0), text=sample_name)
             sample_box.grid(row=n, column=0, padx=1, pady=1)
             sample_box.sample_number = n
             # propagate click events to the button grid instead of default TopLevel 
@@ -96,12 +106,12 @@ class SampleBoxes(Tkinter.Frame):
 
 class SequencerEditor(Tkinter.Toplevel):
 
-    def __init__(self, master, number_beats, sample_names):
+    def __init__(self, master, number_beats, sample_names, bpm):
         Tkinter.Toplevel.__init__(self, master)
 
         number_samples = len(sample_names)
 
-        self.transport_bar = TransportBar(self)
+        self.transport_bar = TransportBar(self, bpm)
         self.transport_bar.grid(row=0, column=1,padx=1, pady=1)
 
         self.header = Header(self, number_beats)

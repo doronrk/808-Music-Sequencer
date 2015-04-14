@@ -49,9 +49,8 @@ class SequencerModel(object):
     def get_sample_states_for_beat(self, beat):
         return self.buttons[beat]
 
-    # def set_bpm(self, bpm):
-    #     #TODO error checking
-    #     self.bpm.set_value(bpm)
+    def set_bpm(self, bpm):
+        self.bpm = bpm
 
     def set_number_beats(self, n_beats):
         self.number_beats.set_value(n_beats)
