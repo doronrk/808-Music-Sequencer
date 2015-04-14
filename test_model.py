@@ -5,6 +5,11 @@ import time
 
 class Tests(unittest.TestCase):
 
+    def test_bpm_to_seconds_per_beat(self):
+        self.assertAlmostEqual(1.0, bpm_to_seconds_per_beat(60.0), delta=.01)
+        self.assertAlmostEqual(.5, bpm_to_seconds_per_beat(120.0), delta=.01)
+        self.assertAlmostEqual(2.0/3.0, bpm_to_seconds_per_beat(90.0), delta=.01)
+
     def test_toggle(self):
         model = SequencerModel(8, 8, 120.0)
         result = model.toggle_button((0,0))
