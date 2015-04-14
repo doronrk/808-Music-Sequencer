@@ -58,7 +58,7 @@ class TransportBar(Tkinter.Frame):
         self.bpm_setter = Tkinter.Canvas(self, width=DEFAULT_TRANSPORT_DIMENSION, 
                                       height=DEFAULT_TRANSPORT_DIMENSION, highlightthickness=1, 
                                       highlightbackground="black")
-        self.bpm_setter.create_text((DEFAULT_TRANSPORT_DIMENSION/2.0,DEFAULT_TRANSPORT_DIMENSION/2.0), text='set bpm',  font=("Helvetica",5))
+        self.bpm_setter.create_text((DEFAULT_TRANSPORT_DIMENSION/2.0,DEFAULT_TRANSPORT_DIMENSION/2.0), text='set bpm',  font=("Helvetica",8))
         self.bpm_setter.grid(row=0, column=2, padx=1, pady=1)
 
         self.number_beats_entry = Tkinter.Entry(self)
@@ -67,7 +67,7 @@ class TransportBar(Tkinter.Frame):
         self.number_beats_setter = Tkinter.Canvas(self, width=DEFAULT_TRANSPORT_DIMENSION, 
                                       height=DEFAULT_TRANSPORT_DIMENSION, highlightthickness=1, 
                                       highlightbackground="black")
-        self.number_beats_setter.create_text((DEFAULT_TRANSPORT_DIMENSION/2.0,DEFAULT_TRANSPORT_DIMENSION/2.0), text='set beats',  font=("Helvetica",5))
+        self.number_beats_setter.create_text((DEFAULT_TRANSPORT_DIMENSION/2.0,DEFAULT_TRANSPORT_DIMENSION/2.0), text='set beats',  font=("Helvetica",8))
         self.number_beats_setter.grid(row=0, column=4, padx=1, pady=1)
 
 class PlaybackButton(Tkinter.Canvas):
