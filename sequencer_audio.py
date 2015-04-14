@@ -1,6 +1,4 @@
-import wave
 import pygame
-import doggy
 
 class SequencerAudio(object):
 

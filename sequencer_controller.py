@@ -1,6 +1,5 @@
 import sys
 import threading
-import time
 from os import listdir
 from sequencer_model import *
 from sequencer_editor import *

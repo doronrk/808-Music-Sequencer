@@ -2,7 +2,7 @@ import Tkinter
 
 DEFAULT_NOTE_DIMENSION = 100
 DEFAULT_TRANSPORT_DIMENSION = DEFAULT_NOTE_DIMENSION / 2.0
-OFFSET_DISTANCE = 10
+OFFSET_DISTANCE = DEFAULT_NOTE_DIMENSION / 10.0
 
 
 class TwoColorBox(Tkinter.Canvas):
@@ -29,9 +29,9 @@ class ButtonGrid(Tkinter.Frame):
 
     def __init__(self, master, number_beats, number_samples):
         Tkinter.Frame.__init__(self, master)
-        self.number_beats = 0
         self.number_samples = number_samples
         self.buttons = []
+        self.number_beats = 0
         self.set_number_beats(number_beats)
 
     def set_number_beats(self, new_number_beats):

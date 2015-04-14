@@ -1,5 +1,3 @@
-import wave
-
 class SequencerConsoleOutput(object):
 
     def __init__(self, sample_files):
