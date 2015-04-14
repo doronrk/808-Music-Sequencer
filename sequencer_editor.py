@@ -75,7 +75,6 @@ class PlaybackButton(Tkinter.Canvas):
         else:
             self.create_polygon(self.tri_coords, fill='green')
 
-
 class TransportBar(Tkinter.Frame):
 
     def __init__(self, master):
@@ -83,19 +82,36 @@ class TransportBar(Tkinter.Frame):
         self.playback_button = PlaybackButton(self)
         self.playback_button.grid()
 
+class SampleBoxes(Tkinter.Frame):
+
+    def __init__(self, master, sample_names):
+        Tkinter.Frame.__init__(self, master)
+        for n, sample_name in enumerate(sample_names):
+            sample_box = Tkinter.Canvas(self, width=DEFAULT_SQAURE_DIMENSION, height=DEFAULT_SQAURE_DIMENSION)
+            sample_box.create_text((DEFAULT_SQAURE_DIMENSION/2.0,DEFAULT_SQAURE_DIMENSION/2.0), text=sample_name)
+            sample_box.grid(row=n, column=0, padx=1, pady=1)
+            sample_box.sample_number = n
+            # propagate click events to the button grid instead of default TopLevel 
+            sample_box.bindtags((self))
 
 class SequencerEditor(Tkinter.Toplevel):
 
-    def __init__(self, master, number_beats, number_samples):
+    def __init__(self, master, number_beats, sample_names):
         Tkinter.Toplevel.__init__(self, master)
 
+        number_samples = len(sample_names)
+
         self.transport_bar = TransportBar(self)
-        self.transport_bar.grid(row=0, padx=1, pady=1)
+        self.transport_bar.grid(row=0, column=1,padx=1, pady=1)
+
         self.header = Header(self, number_beats)
-        self.header.grid(row=1, padx=1, pady=1)
+        self.header.grid(row=1, column=1, padx=1, pady=1)
+
+        self.sample_boxes = SampleBoxes(self, sample_names)
+        self.sample_boxes.grid(row=2, column=0, padx=1, pady=1)
 
         self.button_grid = ButtonGrid(self, number_beats, number_samples)
-        self.button_grid.grid(row=2, padx=1, pady=1)
+        self.button_grid.grid(row=2, column=1, padx=1, pady=1)
 
     def set_button_state(self, position, state):
         beat, sample = position

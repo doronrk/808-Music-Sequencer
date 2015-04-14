@@ -9,17 +9,18 @@ from sequencer_audio import *
 class SequencerController(object):
 
     DEFAULT_N_BEATS = 8
-    DEFAULT_BPM = 60.0
+    DEFAULT_BPM = 135.0
 
     def __init__(self, root, sample_files):
-        number_samples = len(sample_files)
-        self.sequencer_model = SequencerModel(number_samples, SequencerController.DEFAULT_N_BEATS, SequencerController.DEFAULT_BPM)
+        self.sequencer_model = SequencerModel(len(sample_files), SequencerController.DEFAULT_N_BEATS, SequencerController.DEFAULT_BPM)
         self.sequencer_model.current_beat.add_callback(self.beat_update_handler)
 
-        self.sequencer_editor = SequencerEditor(root, SequencerController.DEFAULT_N_BEATS, number_samples)
+        sample_names = [sample_file[:-4].split('/', 1)[1] for sample_file in sample_files]
+        self.sequencer_editor = SequencerEditor(root, SequencerController.DEFAULT_N_BEATS, sample_names)
         self.sequencer_editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
         self.sequencer_editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
-
+        self.sequencer_editor.sample_boxes.bind("<Button-1>", self.sample_box_click_handler)
+        
         self.sequencer_audio = SequencerAudio(sample_files)
 
     def sequencer_click_handler(self, event):
@@ -30,6 +31,10 @@ class SequencerController(object):
     def playback_click_handler(self, event):
         playback_state = self.sequencer_model.toggle_playback()
         self.sequencer_editor.set_playback_state(playback_state)
+
+    def sample_box_click_handler(self, event):
+        sample_number = event.widget.sample_number
+        self.sequencer_audio.play_sample(sample_number)
 
     def beat_update_handler(self, current_beat):
         self.sequencer_editor.set_current_beat(current_beat)
