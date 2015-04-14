@@ -11,7 +11,18 @@ class Tests(unittest.TestCase):
         self.assertTrue(result)
         self.assertTrue(model.buttons[0][0])
 
-    def test_playback(self):
+    def test_get_sample_states(self):
+        model = SequencerModel(8, 8, 120.0)
+        for sample in range(4, 8):
+            model.toggle_button((3, sample))
+        states = model.get_sample_states_for_beat(3)
+        self.assertEquals(set([False]), set(states[0:4]))
+        self.assertEquals(set([True]), set(states[4:]))
+        states = model.get_sample_states_for_beat(0)
+        self.assertEquals(set([False]), set(states))
+
+
+    def test_playback_constant_bpm(self):
         timing_tolerance = .1 # this is the propertion of one beat duration in which timing deviation is tolerated
         bpm = 500.0
         number_beats = 10.0
@@ -37,7 +48,40 @@ class Tests(unittest.TestCase):
             elapsed_time = latter - former
             self.assertAlmostEqual(elapsed_time, seconds_per_beat, delta=timing_tolerance_in_seconds)
 
+    def test_playback_change_bpm(self):
+        begin = time.time()
+        timing_tolerance_in_seconds = .01 
+        bpm = 300.0
+        first_seconds_per_beat = bpm_to_seconds_per_beat(bpm)
+        total_time = first_seconds_per_beat * 3.5
+        print 'this playback test takes', total_time
+        step_times = []
+        def callback(value):
+            step_times.append(time.time())
+        model = SequencerModel(8, 8, bpm)
+        model.current_beat.add_callback(callback)
+        model.toggle_playback()
+        time.sleep(first_seconds_per_beat * 2 - .01)
+        new_bpm = bpm * 2.0
+        model.set_bpm(new_bpm)
+        second_seconds_per_beat = bpm_to_seconds_per_beat(new_bpm)
+        time.sleep(second_seconds_per_beat * 3 + .01)
+        model.toggle_playback()
 
+        before_change = step_times[0:3]
+        after_change = step_times[2:]
+
+        for i in range(len(before_change) - 1):
+            former = before_change[i]
+            latter = before_change[i+1]
+            elapsed_time = latter - former
+            self.assertAlmostEqual(elapsed_time, first_seconds_per_beat, delta=timing_tolerance_in_seconds)
+
+        for i in range(len(after_change) - 1):
+            former = after_change[i]
+            latter = after_change[i+1]
+            elapsed_time = latter - former
+            self.assertAlmostEqual(elapsed_time, second_seconds_per_beat, delta=timing_tolerance_in_seconds)
 
 
 
