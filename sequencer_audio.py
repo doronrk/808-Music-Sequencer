@@ -1,7 +1,6 @@
 import wave
 import sys
 import pygame
-import time
 
 class SequencerAudio(object):
 
