@@ -3,6 +3,7 @@ import threading
 from os import listdir
 from sequencer_model import *
 from sequencer_editor import *
+from sequencer_console_output import *
 
 DEFAULT_N_BEATS = 8
 DEFAULT_BPM = 135.0
@@ -87,7 +88,7 @@ if __name__ == "__main__":
         print 'Pygame audio supported, outputting samples to audio out'
     except ImportError:
         using_audio_out = False
-        from sequencer_console_output import *
+        #from sequencer_console_output import *
         print 'Pygame audio not supported, outputting sample names to console'
         print 'Please install Pygame for audio out'
 
