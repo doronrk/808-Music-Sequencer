@@ -4,7 +4,6 @@ import time
 from os import listdir
 from sequencer_model import *
 from sequencer_editor import *
-from sequencer_audio import *
 
 DEFAULT_N_BEATS = 8
 DEFAULT_BPM = 135.0
@@ -12,7 +11,7 @@ DEFAULT_BPM = 135.0
 class SequencerController(object):
 
 
-    def __init__(self, root, sample_files):
+    def __init__(self, root, sample_files, using_audio_out):
         self.sequencer_model = SequencerModel(len(sample_files), DEFAULT_N_BEATS, DEFAULT_BPM)
         self.sequencer_model.current_beat.add_callback(self.beat_update_handler)
 
@@ -24,7 +23,7 @@ class SequencerController(object):
         self.sequencer_editor.transport_bar.number_beats_setter.bind("<Button-1>", self.number_beats_setter_click_handler)
         self.sequencer_editor.sample_boxes.bind("<Button-1>", self.sample_box_click_handler)
         
-        self.sequencer_audio = SequencerAudio(sample_files)
+        self.sequencer_audio = SequencerAudio(sample_files) if using_audio_out else SequencerConsoleOutput(sample_names)
 
     def sequencer_click_handler(self, event):
         position = event.widget.position
@@ -69,11 +68,20 @@ class SequencerController(object):
 
 
 if __name__ == "__main__":
+    using_audio_out = True
+    try:
+        from sequencer_audio import *
+        print 'Pygame audio supported, outputting samples to audio out'
+    except ImportError:
+        using_audio_out = False
+        from sequencer_console_output import *
+        print 'Pygame audio not supported, outputting sample names to console'
+        print 'Please install Pygame for audio out'
     sample_folder_path = sys.argv[1]
     files_in_sample_folder = listdir(sample_folder_path)
     wav_files_in_sample_folder = [sample_folder_path + '/' + sample for sample in files_in_sample_folder if sample[-4:] == '.wav']
     root = Tkinter.Tk()
     root.withdraw()
-    app = SequencerController(root, wav_files_in_sample_folder)
+    app = SequencerController(root, wav_files_in_sample_folder, using_audio_out)
     root.title("Sequencer")
     root.mainloop()

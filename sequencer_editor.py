@@ -64,16 +64,13 @@ class Header(Tkinter.Frame):
 
     def set_number_beats(self, new_number_beats):
         diff = new_number_beats - self.number_beats
-        print 'diff', diff
         if diff > 0:
             for beat in range(self.number_beats, self.number_beats + diff):
                 header_element = TwoColorBox(self, height=5)
                 header_element.grid(row=0, column=beat, padx=1, pady=1)
-                header_element.c = beat
                 self.header_elements.append(header_element)
         else:
             for header_element in self.header_elements[new_number_beats:]:
-                print 'forgetting header', header_element.c
                 header_element.grid_forget()
             self.header_elements = self.header_elements[:new_number_beats]
         self.number_beats = new_number_beats
