@@ -110,6 +110,5 @@ class Tests(unittest.TestCase):
             self.assertAlmostEqual(elapsed_time, second_seconds_per_beat, delta=timing_tolerance_in_seconds)
 
 
-
 if __name__ == '__main__':
     unittest.main()
