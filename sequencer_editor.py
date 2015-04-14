@@ -75,6 +75,13 @@ class Header(Tkinter.Frame):
             self.header_elements = self.header_elements[:new_number_beats]
         self.number_beats = new_number_beats
 
+    def set_current_beat(self, current_beat):
+        for beat, header_element in enumerate(self.header_elements):
+            if (beat == current_beat):
+                header_element.set_state(True)
+            else:
+                header_element.set_state(False) 
+
 class PlaybackButton(Tkinter.Canvas):
 
     def __init__(self, master):
@@ -160,11 +167,7 @@ class SequencerEditor(Tkinter.Toplevel):
         self.button_grid.buttons[beat][sample].set_state(state)
 
     def set_current_beat(self, current_beat):
-        for beat, header_element in enumerate(self.header.header_elements):
-            if (beat == current_beat):
-                header_element.set_state(True)
-            else:
-                header_element.set_state(False) 
+        self.header.set_current_beat(current_beat)
 
     def set_playback_state(self, state):
         self.transport_bar.playback_button.set_state(state)

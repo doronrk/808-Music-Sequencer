@@ -51,6 +51,42 @@ class Tests(unittest.TestCase):
                 self.assertFalse(button_grid.buttons[beat][sample].state)
                 self.assertTrue(button_grid.buttons[beat][sample].position == position)
 
+    def test_set_current_beat(self):
+        editor = get_editor()
+        editor.set_current_beat(0)
+        header_elements = editor.header.header_elements
+        self.assertTrue(header_elements[0].state)
+        self.assertEquals(set([False]), set([header_element.state for header_element in header_elements[1:]]))
+
+    def test_header_increase_number_beats(self):
+        editor = get_editor()
+        header = editor.header
+        header.set_number_beats(10)
+        self.assertTrue(header.number_beats == 10)
+        self.assertTrue(len(header.header_elements) == 10)
+        for beat in range(10):
+            self.assertFalse(header.header_elements[beat].state)
+
+    def test_header_decrease_number_beats(self):
+        editor = get_editor()
+        header = editor.header
+        header.set_number_beats(4)
+        self.assertTrue(header.number_beats == 4)
+        self.assertTrue(len(header.header_elements) == 4)
+        for beat in range(4):
+            self.assertFalse(header.header_elements[beat].state)
+
+    def test_header_set_number_beats_keep_states(self):
+        editor = get_editor()
+        header = editor.header
+        header_elements = header.header_elements
+        editor.set_current_beat(0)
+        header.set_number_beats(4)
+        self.assertTrue(header_elements[0])
+        self.assertEquals(set([False]), set(header_element.state for header_element in header_elements[1:]))
+
+
+
 
 
 if __name__ == '__main__':
