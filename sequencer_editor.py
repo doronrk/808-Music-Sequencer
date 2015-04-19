@@ -3,6 +3,7 @@ import Tkinter
 DEFAULT_NOTE_DIMENSION = 75
 DEFAULT_TRANSPORT_DIMENSION = DEFAULT_NOTE_DIMENSION / 2.0
 OFFSET_DISTANCE = DEFAULT_NOTE_DIMENSION / 10.0
+BUTTON_TEXT_FONT_SIZE = 8
 
 class SequencerEditor(Tkinter.Toplevel):
     """This is the GUI and propages click events to the SequencerController
@@ -52,23 +53,28 @@ class TransportBar(Tkinter.Frame):
         self.playback_button = PlaybackButton(self)
         self.playback_button.grid(row=0, column=0, padx=1, pady=1)
 
-        self.bpm_entry = Tkinter.Entry(self)
-        self.bpm_entry.grid(row=0, column=1, padx=1, pady=1)
-        self.bpm_entry.insert(0, str(bpm))
-        self.bpm_setter = Tkinter.Canvas(self, width=DEFAULT_TRANSPORT_DIMENSION, 
-                                      height=DEFAULT_TRANSPORT_DIMENSION, highlightthickness=1, 
-                                      highlightbackground="black")
-        self.bpm_setter.create_text((DEFAULT_TRANSPORT_DIMENSION/2.0,DEFAULT_TRANSPORT_DIMENSION/2.0), text='set bpm',  font=("Helvetica",8))
-        self.bpm_setter.grid(row=0, column=2, padx=1, pady=1)
+        self.bpm = EntrySetterPair(self, str(bpm), "set bpm")
+        self.bpm.grid(row=0, column=1, padx=1, pady=1)
+        self.number_beats = EntrySetterPair(self, str(number_beats), "set beats")
+        self.number_beats.grid(row=0, column=2, padx=1, pady=1)
 
-        self.number_beats_entry = Tkinter.Entry(self)
-        self.number_beats_entry.grid(row=0, column=3, padx=1, pady=1)
-        self.number_beats_entry.insert(0, str(number_beats))
-        self.number_beats_setter = Tkinter.Canvas(self, width=DEFAULT_TRANSPORT_DIMENSION, 
+class EntrySetterPair(Tkinter.Frame):
+    """Wraps a text entry widget and its corresponding setter button"""
+    def __init__(self, master, initial_value, setter_text):
+        Tkinter.Frame.__init__(self, master)
+        self.entry = Tkinter.Entry(self)
+        self.entry.grid(row=0, column=0, padx=1, pady=1)
+        self.entry.insert(0, initial_value)
+        self.setter = Tkinter.Canvas(self, width=DEFAULT_TRANSPORT_DIMENSION, 
                                       height=DEFAULT_TRANSPORT_DIMENSION, highlightthickness=1, 
                                       highlightbackground="black")
-        self.number_beats_setter.create_text((DEFAULT_TRANSPORT_DIMENSION/2.0,DEFAULT_TRANSPORT_DIMENSION/2.0), text='set beats',  font=("Helvetica",8))
-        self.number_beats_setter.grid(row=0, column=4, padx=1, pady=1)
+        self.setter.create_text((DEFAULT_TRANSPORT_DIMENSION/2.0,DEFAULT_TRANSPORT_DIMENSION/2.0), text=setter_text,  font=("Helvetica",BUTTON_TEXT_FONT_SIZE))
+        self.setter.grid(row=0, column=1, padx=1, pady=1)
+        # propagate click events from the setter, not the entry box
+        self.setter.bindtags(self)
+
+    def get(self):
+        return self.entry.get()
 
 class PlaybackButton(Tkinter.Canvas):
     STOP_COLOR = 'red'

@@ -29,8 +29,8 @@ class SequencerController(object):
         # binds callbacks with corresponding GUI elements 
         self.sequencer_editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
         self.sequencer_editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
-        self.sequencer_editor.transport_bar.bpm_setter.bind("<Button-1>", self.bpm_setter_click_handler)
-        self.sequencer_editor.transport_bar.number_beats_setter.bind("<Button-1>", self.number_beats_setter_click_handler)
+        self.sequencer_editor.transport_bar.bpm.bind("<Button-1>", self.bpm_setter_click_handler)
+        self.sequencer_editor.transport_bar.number_beats.bind("<Button-1>", self.number_beats_setter_click_handler)
         self.sequencer_editor.sample_boxes.bind("<Button-1>", self.sample_box_click_handler)
         # intializes audio output if dependencies available, console output otherwise
         self.sequencer_audio = SequencerAudio(sample_files) if using_audio_out else SequencerConsoleOutput(sample_names)
@@ -49,7 +49,7 @@ class SequencerController(object):
         self.sequencer_audio.play_sample(sample_number)
 
     def bpm_setter_click_handler(self, event):
-        entry = self.sequencer_editor.transport_bar.bpm_entry.get()
+        entry = self.sequencer_editor.transport_bar.bpm.get()
         new_bpm = None
         try:
             new_bpm = float(entry)
@@ -60,7 +60,7 @@ class SequencerController(object):
         self.sequencer_model.set_bpm(new_bpm)
 
     def number_beats_setter_click_handler(self, event):
-        entry = self.sequencer_editor.transport_bar.number_beats_entry.get()
+        entry = self.sequencer_editor.transport_bar.number_beats.get()
         new_number_beats = None
         try:
             new_number_beats = int(entry)
