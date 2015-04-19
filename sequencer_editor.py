@@ -57,7 +57,7 @@ class TransportBar(Tkinter.Frame):
         self.bpm.grid(row=0, column=1, padx=1, pady=1)
         self.number_beats = EntrySetterPair(self, str(number_beats), "set beats")
         self.number_beats.grid(row=0, column=2, padx=1, pady=1)
-        self.swing = Tkinter.Scale(master, from_=-33.33, to=33.33, orient=Tkinter.HORIZONTAL, label="swing")
+        self.swing = Tkinter.Scale(master, from_=-1.0, to=1.0, orient=Tkinter.HORIZONTAL, label="swing", resolution=0.01)
         self.swing.set(swing)
         self.swing.grid(row=0, column=3, padx=1, pady=1)
 

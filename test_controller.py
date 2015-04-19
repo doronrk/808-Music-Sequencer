@@ -94,7 +94,7 @@ class Tests(unittest.TestCase):
 
     def test_swing_scale(self):
         controller = create_controller()
-        new_swing = 20.0
+        new_swing = .2
         controller.sequencer_editor.transport_bar.swing.set(new_swing)
         controller.swing_setter_click_handler(None)
         self.assertAlmostEquals(new_swing, controller.sequencer_model.swing)
