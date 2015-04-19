@@ -10,13 +10,14 @@ def bpm_to_seconds_per_beat(bpm):
 class SequencerModel(object):
     """This class stores the state of the sequencer"""
     
-    def __init__(self, number_samples, number_beats, bpm):
+    def __init__(self, number_samples, number_beats, bpm, swing):
         self.number_samples = number_samples
         # number of beats by number of samples list representing the state of each button 
         self.buttons = [[False for sample in range(number_samples)] for beat in range(number_beats)]
         self.playback_state = False
         self.bpm = bpm
         self.number_beats = number_beats
+        self.swing = swing
         # current beat is observed by the controller to notify GUI and audio out 
         self.current_beat = Observable(0)
 
@@ -75,4 +76,7 @@ class SequencerModel(object):
         else:
             self.buttons = self.buttons[:new_number_beats]
         self.number_beats = new_number_beats
+
+    def set_swing(self, swing):
+        self.swing = swing
     

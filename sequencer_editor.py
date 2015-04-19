@@ -14,12 +14,12 @@ class SequencerEditor(Tkinter.Toplevel):
         Button Grid-    Indicates the state of each button. Clicking a button toggles its state
     """
 
-    def __init__(self, master, number_beats, sample_names, bpm):
+    def __init__(self, master, number_beats, sample_names, bpm, swing):
         Tkinter.Toplevel.__init__(self, master)
 
         number_samples = len(sample_names)
 
-        self.transport_bar = TransportBar(self, bpm, number_beats)
+        self.transport_bar = TransportBar(self, bpm, number_beats, swing)
         self.transport_bar.grid(row=0, column=1,padx=1, pady=1)
 
         self.header = Header(self, number_beats)
@@ -48,7 +48,7 @@ class SequencerEditor(Tkinter.Toplevel):
 
 class TransportBar(Tkinter.Frame):
     """Allows the user to control the playback, bpm, and number of beats"""
-    def __init__(self, master, bpm, number_beats):
+    def __init__(self, master, bpm, number_beats, swing):
         Tkinter.Frame.__init__(self, master)
         self.playback_button = PlaybackButton(self)
         self.playback_button.grid(row=0, column=0, padx=1, pady=1)
@@ -57,12 +57,15 @@ class TransportBar(Tkinter.Frame):
         self.bpm.grid(row=0, column=1, padx=1, pady=1)
         self.number_beats = EntrySetterPair(self, str(number_beats), "set beats")
         self.number_beats.grid(row=0, column=2, padx=1, pady=1)
+        self.swing = Tkinter.Scale(master, from_=-33.33, to=33.33, orient=Tkinter.HORIZONTAL, label="swing")
+        self.swing.set(swing)
+        self.swing.grid(row=0, column=3, padx=1, pady=1)
 
 class EntrySetterPair(Tkinter.Frame):
     """Wraps a text entry widget and its corresponding setter button"""
     def __init__(self, master, initial_value, setter_text):
         Tkinter.Frame.__init__(self, master)
-        self.entry = Tkinter.Entry(self)
+        self.entry = Tkinter.Entry(self, width=5)
         self.entry.grid(row=0, column=0, padx=1, pady=1)
         self.entry.insert(0, initial_value)
         self.setter = Tkinter.Canvas(self, width=DEFAULT_TRANSPORT_DIMENSION, 
