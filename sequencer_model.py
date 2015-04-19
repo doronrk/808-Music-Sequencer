@@ -74,7 +74,8 @@ class SequencerModel(object):
         self.bpm = bpm
 
     def set_number_beats(self, new_number_beats):
-        """Updates the number of beats.
+        """
+        Updates the number of beats.
         Maintains the state of unaffected buttons.
         State of new buttons defaults to off.
         """
