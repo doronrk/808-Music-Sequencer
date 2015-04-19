@@ -74,8 +74,8 @@ class SequencerController(object):
         self.sequencer_editor.set_number_beats(new_number_beats)
 
     def swing_setter_click_handler(self, event):
-        value = self.sequencer_editor.transport_bar.swing.get()
-        print value
+        value = float(self.sequencer_editor.transport_bar.swing.get())
+        self.sequencer_model.set_swing(value)
 
     def beat_update_handler(self, current_beat):
         self.sequencer_editor.set_current_beat(current_beat)

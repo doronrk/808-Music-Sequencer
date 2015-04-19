@@ -4,10 +4,9 @@ import unittest
 def get_editor():
     root = Tkinter.Tk()
     sample_names = [str(i) for i in range(8)]
-    return SequencerEditor(root, 8, sample_names, 120.0)
+    return SequencerEditor(root, 8, sample_names, 120.0, 0.0)
 
 class Tests(unittest.TestCase):
-
 
     def test_button_grid_increase_number_beats(self):
         editor = get_editor()
