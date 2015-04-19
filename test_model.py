@@ -11,13 +11,13 @@ class Tests(unittest.TestCase):
         self.assertAlmostEqual(2.0/3.0, bpm_to_seconds_per_beat(90.0), delta=.01)
 
     def test_toggle(self):
-        model = SequencerModel(8, 8, 120.0)
+        model = SequencerModel(8, 8, 120.0, 0.0)
         result = model.toggle_button((0,0))
         self.assertTrue(result)
         self.assertTrue(model.buttons[0][0])
 
     def test_get_sample_states(self):
-        model = SequencerModel(8, 8, 120.0)
+        model = SequencerModel(8, 8, 120.0, 0.0)
         for sample in range(4, 8):
             model.toggle_button((3, sample))
         states = model.get_sample_states_for_beat(3)
@@ -27,7 +27,7 @@ class Tests(unittest.TestCase):
         self.assertEquals(set([False]), set(states))
 
     def test_set_number_beats_increase(self):
-        model = SequencerModel(8, 8, 120.0)
+        model = SequencerModel(8, 8, 120.0, 0.0)
         model.set_number_beats(10)
         self.assertTrue(model.number_beats == 10)
         for beat in range(10):
@@ -36,7 +36,7 @@ class Tests(unittest.TestCase):
                 self.assertFalse(model.buttons[beat][sample])
 
     def test_set_number_beats_decrease(self):
-        model = SequencerModel(8, 8, 120.0)
+        model = SequencerModel(8, 8, 120.0, 0.0)
         model.set_number_beats(4)
         self.assertTrue(model.number_beats == 4)
         for beat in range(4):
@@ -45,7 +45,7 @@ class Tests(unittest.TestCase):
                 self.assertFalse(model.buttons[beat][sample])
 
     def test_set_number_beats_keep_button_states(self):
-        model = SequencerModel(8, 8, 120.0)
+        model = SequencerModel(8, 8, 120.0, 0.0)
         for sample in range(4, 8):
             model.toggle_button((3, sample))
         model.set_number_beats(10)
@@ -64,7 +64,7 @@ class Tests(unittest.TestCase):
         step_times = []
         def callback(value):
             step_times.append(time.time())
-        model = SequencerModel(8, 8, bpm)
+        model = SequencerModel(8, 8, bpm, 0.0)
         model.current_beat.add_callback(callback)
         new_state = model.toggle_playback()
         self.assertTrue(new_state)
@@ -89,7 +89,7 @@ class Tests(unittest.TestCase):
         step_times = []
         def callback(value):
             step_times.append(time.time())
-        model = SequencerModel(8, 8, bpm)
+        model = SequencerModel(8, 8, bpm, 0.0)
         model.current_beat.add_callback(callback)
         model.toggle_playback()
         time.sleep(first_seconds_per_beat * 2 - .01)
@@ -114,6 +114,57 @@ class Tests(unittest.TestCase):
             elapsed_time = latter - former
             self.assertAlmostEqual(elapsed_time, second_seconds_per_beat, delta=timing_tolerance_in_seconds)
 
+    def test_set_swing(self):
+        swing = .5
+        model = SequencerModel(8, 8, 120.0, swing)
+        model.set_swing(1.1)
+        self.assertAlmostEqual(model.swing, 1.0, delta=.01)
+
+        model.set_swing(-1.1)
+        self.assertAlmostEqual(model.swing, -1.0, delta=.01)
+
+        model.set_swing(-.5)
+        self.assertAlmostEqual(model.swing, -.5, delta=.01)
+
+    def test_calculate_beat_duration_no_swing(self):
+        timing_tolerance = 1.0
+        swing = 0.0
+        bpm = 60.0
+        model = SequencerModel(8, 8, bpm, swing)
+        expected_beat_duration = 1.0
+        beat_duration = model._calculate_beat_duration()
+        self.assertAlmostEqual(expected_beat_duration, beat_duration, delta=timing_tolerance)
+        model.current_beat.set_value(1)
+        beat_duration = model._calculate_beat_duration()
+        self.assertAlmostEqual(expected_beat_duration, beat_duration, delta=timing_tolerance)
+
+    def test_calculate_beat_duration_positive_swing(self):
+        timing_tolerance = 0.01
+        swing = 1.0
+        bpm = 60.0
+        model = SequencerModel(8, 8, bpm, swing)
+        expected_beat_duration_downbeat = 1.0 + swing/3.0
+        expected_beat_duration_upbeat = 1.0 - swing/3.0
+
+        downbeat_duration = model._calculate_beat_duration()
+        model.current_beat.set_value(1)
+        upbeat_duration = model._calculate_beat_duration()
+        self.assertAlmostEqual(expected_beat_duration_downbeat, downbeat_duration, delta=timing_tolerance)
+        self.assertAlmostEqual(expected_beat_duration_upbeat, upbeat_duration, delta=timing_tolerance)
+
+    def test_calculate_beat_duration_negative_swing(self):
+        timing_tolerance = 0.01
+        swing = -1.0
+        bpm = 60.0
+        model = SequencerModel(8, 8, bpm, swing)
+        expected_beat_duration_downbeat = 1.0 + swing/3.0
+        expected_beat_duration_upbeat = 1.0 - swing/3.0
+
+        downbeat_duration = model._calculate_beat_duration()
+        model.current_beat.set_value(1)
+        upbeat_duration = model._calculate_beat_duration()
+        self.assertAlmostEqual(expected_beat_duration_downbeat, downbeat_duration, delta=timing_tolerance)
+        self.assertAlmostEqual(expected_beat_duration_upbeat, upbeat_duration, delta=timing_tolerance)
 
 if __name__ == '__main__':
     unittest.main()

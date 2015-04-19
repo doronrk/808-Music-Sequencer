@@ -50,34 +50,34 @@ class Tests(unittest.TestCase):
     def test_bpm_setter_invalid_bpm(self):
         controller = create_controller()
         e0 = Tests.PseudoEvent((0,0))
-        controller.sequencer_editor.transport_bar.bpm_entry.insert(0, 'not a number')
+        controller.sequencer_editor.transport_bar.bpm.entry.insert(0, 'not a number')
         controller.bpm_setter_click_handler(e0)
         self.assertTrue(controller.sequencer_model.bpm == DEFAULT_BPM)
 
-        controller.sequencer_editor.transport_bar.bpm_entry.insert(0, '0.0')
+        controller.sequencer_editor.transport_bar.bpm.entry.insert(0, '0.0')
         controller.bpm_setter_click_handler(e0)
         self.assertTrue(controller.sequencer_model.bpm == DEFAULT_BPM)
 
-        controller.sequencer_editor.transport_bar.bpm_entry.insert(0, '-1.0')
+        controller.sequencer_editor.transport_bar.bpm.entry.insert(0, '-1.0')
         controller.bpm_setter_click_handler(e0)
         self.assertTrue(controller.sequencer_model.bpm == DEFAULT_BPM)
 
     def test_number_beats_setter_invalid_bpm(self):
         controller = create_controller()
         e0 = Tests.PseudoEvent((0,0))
-        controller.sequencer_editor.transport_bar.number_beats_entry.insert(0, 'not a number')
+        controller.sequencer_editor.transport_bar.number_beats.entry.insert(0, 'not a number')
         controller.number_beats_setter_click_handler(e0)
         self.assertTrue(controller.sequencer_model.number_beats == DEFAULT_N_BEATS)
 
-        controller.sequencer_editor.transport_bar.number_beats_entry.insert(0, '3.5')
+        controller.sequencer_editor.transport_bar.number_beats.entry.insert(0, '3.5')
         controller.number_beats_setter_click_handler(e0)
         self.assertTrue(controller.sequencer_model.number_beats == DEFAULT_N_BEATS)
 
-        controller.sequencer_editor.transport_bar.number_beats_entry.insert(0, '0.0')
+        controller.sequencer_editor.transport_bar.number_beats.entry.insert(0, '0.0')
         controller.number_beats_setter_click_handler(e0)
         self.assertTrue(controller.sequencer_model.number_beats == DEFAULT_N_BEATS)
 
-        controller.sequencer_editor.transport_bar.number_beats_entry.insert(0, '-1.0')
+        controller.sequencer_editor.transport_bar.number_beats.entry.insert(0, '-1.0')
         controller.number_beats_setter_click_handler(e0)
         self.assertTrue(controller.sequencer_model.number_beats == DEFAULT_N_BEATS)
 
@@ -91,6 +91,13 @@ class Tests(unittest.TestCase):
         self.assertTrue(header_elements[3].state)
         self.assertEquals(set([False]), set([element.state for element in header_elements[:3]]))
         self.assertEquals(set([False]), set([element.state for element in header_elements[4:]]))
+
+    def test_swing_scale(self):
+        controller = create_controller()
+        new_swing = .2
+        controller.sequencer_editor.transport_bar.swing.set(new_swing)
+        controller.swing_setter_click_handler(None)
+        self.assertAlmostEquals(new_swing, controller.sequencer_model.swing)
 
 
 if __name__ == '__main__':

@@ -10,13 +10,15 @@ def bpm_to_seconds_per_beat(bpm):
 class SequencerModel(object):
     """This class stores the state of the sequencer"""
     
-    def __init__(self, number_samples, number_beats, bpm):
+    def __init__(self, number_samples, number_beats, bpm, swing):
         self.number_samples = number_samples
         # number of beats by number of samples list representing the state of each button 
         self.buttons = [[False for sample in range(number_samples)] for beat in range(number_beats)]
         self.playback_state = False
         self.bpm = bpm
         self.number_beats = number_beats
+        # when current_beat %2 == 0, the beat duration increases proportionally by swing/3.0, otherwise, the beat duration decreases proportionally by swing/3.0
+        self.set_swing(swing)
         # current beat is observed by the controller to notify GUI and audio out 
         self.current_beat = Observable(0)
 
@@ -41,15 +43,28 @@ class SequencerModel(object):
 
     def _step_worker(self):
         while(self.playback_state):
-            current_beat_value = self.current_beat.get_value()
-            seconds_per_beat = bpm_to_seconds_per_beat(self.bpm)
-            time.sleep(seconds_per_beat)
+            seconds_for_this_beat = self._calculate_beat_duration()
+            time.sleep(seconds_for_this_beat)
             if (self.playback_state): # check to see if playback stopped while sleeping
                 # wrap the beat back around to 0
+                current_beat_value = self.current_beat.get_value()
                 if (current_beat_value >= self.number_beats - 1):
                     self.current_beat.set_value(0)
                 else:
                     self.current_beat.set_value(current_beat_value + 1)
+
+    def _calculate_beat_duration(self):
+        """
+        This method returns the number of seconds this beat should last
+        This value is calculatd by converting beats/minute to seconds/beat then applying swing
+        """
+        seconds_per_beat_before_swing = bpm_to_seconds_per_beat(self.bpm)
+        swing_delta = (self.swing / 3.0) * seconds_per_beat_before_swing            
+        current_beat_value = self.current_beat.get_value()
+        if current_beat_value % 2 == 0:
+            return seconds_per_beat_before_swing + swing_delta
+        return seconds_per_beat_before_swing - swing_delta
+
 
     def get_sample_states_for_beat(self, beat):
         """Returns a list of the states of the buttons for the given beat"""
@@ -59,7 +74,8 @@ class SequencerModel(object):
         self.bpm = bpm
 
     def set_number_beats(self, new_number_beats):
-        """Updates the number of beats.
+        """
+        Updates the number of beats.
         Maintains the state of unaffected buttons.
         State of new buttons defaults to off.
         """
@@ -75,4 +91,12 @@ class SequencerModel(object):
         else:
             self.buttons = self.buttons[:new_number_beats]
         self.number_beats = new_number_beats
+
+    def set_swing(self, swing):
+        if swing < -1.0:
+            self.swing = -1.0
+        elif swing > 1.0:
+            self.swing = 1.0
+        else:
+            self.swing = swing
     
