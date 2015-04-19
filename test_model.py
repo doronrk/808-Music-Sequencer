@@ -114,6 +114,18 @@ class Tests(unittest.TestCase):
             elapsed_time = latter - former
             self.assertAlmostEqual(elapsed_time, second_seconds_per_beat, delta=timing_tolerance_in_seconds)
 
+    def test_set_swing(self):
+        swing = .5
+        model = SequencerModel(8, 8, 120.0, swing)
+        model.set_swing(1.1)
+        self.assertAlmostEqual(model.swing, 1.0, delta=.01)
+
+        model.set_swing(-1.1)
+        self.assertAlmostEqual(model.swing, -1.0, delta=.01)
+
+        model.set_swing(-.5)
+        self.assertAlmostEqual(model.swing, -.5, delta=.01)
+
     def test_calculate_beat_duration_no_swing(self):
         timing_tolerance = 1.0
         swing = 0.0

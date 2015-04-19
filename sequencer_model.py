@@ -17,8 +17,8 @@ class SequencerModel(object):
         self.playback_state = False
         self.bpm = bpm
         self.number_beats = number_beats
-        # when current_beat %2 == 0, the beat duration increases by swing/3.0, otherwise, the beat duration decreases by swing/3.0
-        self.swing = swing
+        # when current_beat %2 == 0, the beat duration increases proportionally by swing/3.0, otherwise, the beat duration decreases proportionally by swing/3.0
+        self.set_swing(swing)
         # current beat is observed by the controller to notify GUI and audio out 
         self.current_beat = Observable(0)
 
@@ -92,5 +92,10 @@ class SequencerModel(object):
         self.number_beats = new_number_beats
 
     def set_swing(self, swing):
-        self.swing = swing
+        if swing < -1.0:
+            self.swing = -1.0
+        elif swing > 1.0:
+            self.swing = 1.0
+        else:
+            self.swing = swing
     
