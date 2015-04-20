@@ -2,6 +2,9 @@ from sequencer_model import *
 import unittest
 import time
 
+# time each async test will take in seconsd
+TIME_FOR_ASYNC_TESTS = 4.0
+
 
 class Tests(unittest.TestCase):
 
@@ -53,66 +56,82 @@ class Tests(unittest.TestCase):
         self.assertEquals(set([False]), set(states[0:4]))
         self.assertEquals(set([True]), set(states[4:]))
 
-    def test_playback_constant_bpm(self):
-        timing_tolerance = .1 # this is the propertion of one beat duration in which timing deviation is tolerated
-        bpm = 500.0
-        number_beats = 10.0
-        seconds_per_beat = bpm_to_seconds_per_beat(bpm)
-        timing_tolerance_in_seconds = timing_tolerance * seconds_per_beat
-        total_elapsed_time = number_beats * seconds_per_beat
-        print 'this playback test takes', total_elapsed_time, 'seconds'
-        step_times = []
-        def callback(value):
-            step_times.append(time.time())
+    def test_playback_timing_constant_bpm(self):
+        print 'this playback timing test takes ~', TIME_FOR_ASYNC_TESTS, 'seconds'
+        timing_tolerance = 0.1
+        bpm = 240.0
         model = SequencerModel(8, 8, bpm, 0.0)
-        model.current_beat.add_callback(callback)
+        expected_beat_duration = model._calculate_beat_duration()
+        step_times = []
+        def assertion_callback(value):
+            step_times.append(time.time())
+
+        model.current_beat.add_callback(assertion_callback)
         new_state = model.toggle_playback()
         self.assertTrue(new_state)
-
-        time.sleep(total_elapsed_time + timing_tolerance_in_seconds)
+        time.sleep(TIME_FOR_ASYNC_TESTS)
         new_state = model.toggle_playback()
         self.assertFalse(new_state)
 
         for i in range(len(step_times) - 1):
             former = step_times[i]
-            latter = step_times[i+1]
-            elapsed_time = latter - former
-            self.assertAlmostEqual(elapsed_time, seconds_per_beat, delta=timing_tolerance_in_seconds)
+            latter = step_times[i + 1]
+            duration = latter - former
+            self.assertAlmostEqual(duration, expected_beat_duration, delta=timing_tolerance)
 
-    def test_playback_change_bpm(self):
-        begin = time.time()
-        timing_tolerance_in_seconds = .01 
-        bpm = 300.0
-        first_seconds_per_beat = bpm_to_seconds_per_beat(bpm)
-        total_time = first_seconds_per_beat * 3.5
-        print 'this playback test takes', total_time
+    def test_playback_timing_change_bpm(self):
+        print 'this playback timing test takes ~', TIME_FOR_ASYNC_TESTS, 'seconds'
+        timing_tolerance = 0.1
+        first_bpm = 240.0
+        second_bpm = first_bpm/2.0
+        model = SequencerModel(8, 8, first_bpm, 0.0)
+        first_beat_duration = model._calculate_beat_duration()
+        second_beat_duration = first_beat_duration * 2.0
         step_times = []
-        def callback(value):
-            step_times.append(time.time())
-        model = SequencerModel(8, 8, bpm, 0.0)
-        model.current_beat.add_callback(callback)
+        def assertion_callback(value):
+            step_times.append((time.time(), model._calculate_beat_duration()))
+
+        model.current_beat.add_callback(assertion_callback)
         model.toggle_playback()
-        time.sleep(first_seconds_per_beat * 2 - .01)
-        new_bpm = bpm * 2.0
-        model.set_bpm(new_bpm)
-        second_seconds_per_beat = bpm_to_seconds_per_beat(new_bpm)
-        time.sleep(second_seconds_per_beat * 3 + .01)
+        time.sleep(TIME_FOR_ASYNC_TESTS/2.0)
+        model.set_bpm(second_bpm)
+        time.sleep(TIME_FOR_ASYNC_TESTS/2.0)
         model.toggle_playback()
 
-        before_change = step_times[0:3]
-        after_change = step_times[2:]
+        for i in range(len(step_times) - 1):
+            former, expected_duration = step_times[i]
+            latter, _ = step_times[i + 1]
+            duration = latter - former
+            self.assertAlmostEqual(duration, expected_duration, delta=timing_tolerance)
 
-        for i in range(len(before_change) - 1):
-            former = before_change[i]
-            latter = before_change[i+1]
-            elapsed_time = latter - former
-            self.assertAlmostEqual(elapsed_time, first_seconds_per_beat, delta=timing_tolerance_in_seconds)
+    def test_playback_timing_swing(self):
+        print 'this playback timing test takes ~', TIME_FOR_ASYNC_TESTS, 'seconds'
+        timing_tolerance = 0.1
+        bpm = 240.0
+        swing = .5
+        model = SequencerModel(8, 8, bpm, swing)
+        avg_beat_duration = model._calculate_beat_duration()
+        swing_delta = avg_beat_duration * swing/3.0
+        step_times = []
+        def assertion_callback(value):
+            step_times.append((time.time(), value))
 
-        for i in range(len(after_change) - 1):
-            former = after_change[i]
-            latter = after_change[i+1]
-            elapsed_time = latter - former
-            self.assertAlmostEqual(elapsed_time, second_seconds_per_beat, delta=timing_tolerance_in_seconds)
+        model.current_beat.add_callback(assertion_callback)
+        model.toggle_playback()
+        time.sleep(TIME_FOR_ASYNC_TESTS)
+        model.toggle_playback()
+
+        for i in range(len(step_times) - 1):
+            former, beat_number = step_times[i]
+            latter, _ = step_times[i + 1]
+            duration = latter - former
+            expected_beat_duration = avg_beat_duration
+            if beat_number % 2 == 0:
+                expected_beat_duration = expected_beat_duration + swing_delta
+            else:
+                expected_beat_duration = expected_beat_duration - swing_delta
+            self.assertAlmostEqual(duration, expected_beat_duration, delta=timing_tolerance)
+
 
     def test_set_swing(self):
         swing = .5
