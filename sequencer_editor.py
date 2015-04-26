@@ -14,22 +14,30 @@ class SequencerEditor(Tkinter.Toplevel):
         Button Grid-    Indicates the state of each button. Clicking a button toggles its state
     """
 
-    def __init__(self, master, number_beats, sample_names, bpm, swing):
-        Tkinter.Toplevel.__init__(self, master)
+    def __init__(self, root, number_beats, sample_names, bpm, swing):
+        Tkinter.Toplevel.__init__(self, root)
+        self.root = root
 
         number_samples = len(sample_names)
 
+
+        self.quit_button = Tkinter.Button(self, text="Quit", command=self.quit)
+        self.quit_button.grid(row=0, column=0, padx=1, pady=1 )
+
         self.transport_bar = TransportBar(self, bpm, number_beats, swing)
-        self.transport_bar.grid(row=0, column=1,padx=1, pady=1)
+        self.transport_bar.grid(row=1, column=1,padx=1, pady=1)
 
         self.header = Header(self, number_beats)
-        self.header.grid(row=1, column=1, padx=1, pady=1)
+        self.header.grid(row=2, column=1, padx=1, pady=1)
 
         self.sample_boxes = SampleBoxes(self, sample_names)
-        self.sample_boxes.grid(row=2, column=0, padx=1, pady=1)
+        self.sample_boxes.grid(row=3, column=0, padx=1, pady=1)
 
         self.button_grid = ButtonGrid(self, number_beats, number_samples)
-        self.button_grid.grid(row=2, column=1, padx=1, pady=1)
+        self.button_grid.grid(row=3, column=1, padx=1, pady=1)
+
+    def quit(self):
+        self.root.quit()
 
     def set_button_state(self, position, state):
         beat, sample = position
