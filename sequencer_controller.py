@@ -83,7 +83,6 @@ class SequencerController(object):
         sample_states = self.sequencer_model.get_sample_states_for_beat(current_beat)
         self.sequencer_audio.play_samples(sample_states)
 
-
 if __name__ == "__main__":
     if not len(sys.argv) == 2:
         print 'usage: python sequencer_controller.py [relative_path_to_sample_folder]'

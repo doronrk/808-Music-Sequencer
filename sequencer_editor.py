@@ -19,8 +19,9 @@ class SequencerEditor(Tkinter.Toplevel):
         self.root = root
 
         number_samples = len(sample_names)
-
-
+        
+        # handle exit
+        self.protocol("WM_DELETE_WINDOW", self.quit)
         self.quit_button = Tkinter.Button(self, text="Quit", command=self.quit)
         self.quit_button.grid(row=0, column=0, padx=1, pady=1 )
 
@@ -37,7 +38,7 @@ class SequencerEditor(Tkinter.Toplevel):
         self.button_grid.grid(row=3, column=1, padx=1, pady=1)
 
     def quit(self):
-        self.root.quit()
+        self.root.destroy()
 
     def set_button_state(self, position, state):
         beat, sample = position
