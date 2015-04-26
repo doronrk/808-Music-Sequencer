@@ -1,15 +1,11 @@
-import sys
 import threading
-import Tkinter
-from os import listdir
 from model import Model
 from editor import Editor
-from console_output import ConsoleOutput
 
 DEFAULT_N_BEATS = 8
 DEFAULT_BPM = 135.0
 DEFAULT_SWING = 0.0
-DEFAULT_COLUMNS_PER_BEAT = 2.0 
+DEFAULT_COLUMNS_PER_BEAT = 2.0
 
 class Controller(object):
     """The SequencerController updates the SequencerModel according to GUI events
@@ -40,7 +36,12 @@ class Controller(object):
         self.editor.transport_bar.swing.bind("<ButtonRelease-1>", self.swing_setter_click_handler)
         self.editor.sample_boxes.bind("<Button-1>", self.sample_box_click_handler)
         # intializes audio output if dependencies available, console output otherwise
-        self.output = Audio(sample_files) if using_audio_out else ConsoleOutput(sample_names)
+        if using_audio_out:
+            from audio import Audio
+            self.output = Audio(sample_files)
+        else:
+            from console_output import ConsoleOutput
+            self.output = ConsoleOutput(sample_names)
 
     def quit(self):
         self.model.playback_state = False
@@ -94,34 +95,3 @@ class Controller(object):
         self.editor.set_current_beat(current_beat)
         sample_states = self.model.get_sample_states_for_beat(current_beat)
         self.output.play_samples(sample_states)
-
-if __name__ == "__main__":
-    if not len(sys.argv) == 2:
-        print 'usage: python sequencer_controller.py [relative_path_to_sample_folder]'
-        sys.exit()
-    sample_folder_path = sys.argv[1]
-    try:
-        files_in_sample_folder = listdir(sample_folder_path)
-    except OSError:
-        print 'Could not locate sample folder'
-        sys.exit()
-    wav_files_in_sample_folder = [sample_folder_path + '/' + sample for sample in files_in_sample_folder if sample[-4:] == '.wav']
-    if len(wav_files_in_sample_folder) == 0:
-        print 'Could not locate any .wav files in the sample folder'
-        sys.exit()
-
-    using_audio_out = True
-    try:
-        from audio import Audio
-        print 'Pygame audio supported, outputting samples to audio out'
-    except ImportError:
-        using_audio_out = False
-        #from sequencer_console_output import *
-        print 'Pygame audio not supported, outputting sample names to console'
-        print 'Please install Pygame for audio out'
-
-    root = Tkinter.Tk()
-    root.withdraw()
-    app = Controller(root, wav_files_in_sample_folder, using_audio_out)
-    root.title("Sequencer")
-    root.mainloop()

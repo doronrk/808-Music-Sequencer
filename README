@@ -1,7 +1,9 @@
-usage: python sequencer_controller.py [relative_path_to_sample_folder]
+usage from top-: python sequencer [relative_path_to_sample_folder]
 
 the program will automatically load all .wav files from the sample folder
 
-for example, "python sequencer_controller.py samples" directs the program to the samples folder included in the repository
+for example, "python sequencer samples" directs the program to the samples folder included in the repository
 
 audio out relies on pygame, but the program defaults to console output if pygame cannot be imported
+
+to run all tests from the top-level directory: python -m unittest discover

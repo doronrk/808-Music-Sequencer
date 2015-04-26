@@ -1,4 +1,5 @@
 import pygame
+import doesnotexist
 
 class Audio(object):
 
