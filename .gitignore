@@ -1,2 +1,3 @@
 # exclude .pyc files
-/*.pyc
+/sequencer/*.pyc
+/test/*.pyc
