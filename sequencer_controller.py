@@ -8,6 +8,7 @@ from sequencer_console_output import *
 DEFAULT_N_BEATS = 8
 DEFAULT_BPM = 135.0
 DEFAULT_SWING = 0.0
+DEFAULT_COLUMNS_PER_BEAT = 2.0 
 
 class SequencerController(object):
     """The SequencerController updates the SequencerModel according to GUI events
@@ -21,7 +22,7 @@ class SequencerController(object):
         using_audio_out - True if pygame dependency supported, False otherwise
         """
         
-        self.sequencer_model = SequencerModel(len(sample_files), DEFAULT_N_BEATS, DEFAULT_BPM, DEFAULT_SWING)
+        self.sequencer_model = SequencerModel(len(sample_files), DEFAULT_N_BEATS, DEFAULT_BPM, DEFAULT_SWING, DEFAULT_COLUMNS_PER_BEAT)
         self.sequencer_model.current_beat.add_callback(self.beat_update_handler)
 
         # remove relative path and .wav from filenames

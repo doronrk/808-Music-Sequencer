@@ -10,7 +10,7 @@ def bpm_to_seconds_per_beat(bpm):
 class SequencerModel(object):
     """This class stores the state of the sequencer"""
     
-    def __init__(self, number_samples, number_beats, bpm, swing):
+    def __init__(self, number_samples, number_beats, bpm, swing, columns_per_beat):
         self.number_samples = number_samples
         # number of beats by number of samples list representing the state of each button 
         self.buttons = [[False for sample in range(number_samples)] for beat in range(number_beats)]
@@ -19,6 +19,8 @@ class SequencerModel(object):
         self.number_beats = number_beats
         # when current_beat %2 == 0, the beat duration increases proportionally by swing/3.0, otherwise, the beat duration decreases proportionally by swing/3.0
         self.set_swing(swing)
+        # an int representing the number of columns visited for each beat
+        self.columns_per_beat = columns_per_beat
         # current beat is observed by the controller to notify GUI and audio out 
         self.current_beat = Observable(0)
 
@@ -44,7 +46,8 @@ class SequencerModel(object):
     def _step_worker(self):
         while(self.playback_state):
             seconds_for_this_beat = self._calculate_beat_duration()
-            time.sleep(seconds_for_this_beat)
+            seconds_for_this_column = seconds_for_this_beat/self.columns_per_beat
+            time.sleep(seconds_for_this_column)
             if (self.playback_state): # check to see if playback stopped while sleeping
                 # wrap the beat back around to 0
                 current_beat_value = self.current_beat.get_value()
@@ -91,6 +94,9 @@ class SequencerModel(object):
         else:
             self.buttons = self.buttons[:new_number_beats]
         self.number_beats = new_number_beats
+
+    def set_columns_per_beat(self, columns_per_beat):
+        self.columns_per_beat = columns_per_beat
 
     def set_swing(self, swing):
         if swing < -1.0:
