@@ -1,5 +1,6 @@
 import sys
 import threading
+import Tkinter
 from os import listdir
 from model import Model
 from editor import Editor
@@ -21,14 +22,17 @@ class Controller(object):
         sample_files - list of relative paths to samples
         using_audio_out - True if pygame dependency supported, False otherwise
         """
-        
+        self.root = root
         self.model = Model(len(sample_files), DEFAULT_N_BEATS, DEFAULT_BPM, DEFAULT_SWING, DEFAULT_COLUMNS_PER_BEAT)
         self.model.current_beat.add_callback(self.beat_update_handler)
 
         # remove relative path and .wav from filenames
-        sample_names = [sample_file[:-4].split('/', 1)[1] for sample_file in sample_files]
+        sample_names = [sample_file[:-4].rsplit('/', 1)[1] for sample_file in sample_files]
         self.editor = Editor(root, DEFAULT_N_BEATS, sample_names, DEFAULT_BPM, DEFAULT_SWING)
+        # handle window close
+        self.editor.protocol("WM_DELETE_WINDOW", self.quit)
         # binds callbacks with corresponding GUI elements 
+        self.editor.quit_button.bind("<Button-1>", self.quit_click_handler)
         self.editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
         self.editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
         self.editor.transport_bar.bpm.bind("<Button-1>", self.bpm_setter_click_handler)
@@ -37,6 +41,14 @@ class Controller(object):
         self.editor.sample_boxes.bind("<Button-1>", self.sample_box_click_handler)
         # intializes audio output if dependencies available, console output otherwise
         self.output = Audio(sample_files) if using_audio_out else ConsoleOutput(sample_names)
+
+    def quit(self):
+        self.model.playback_state = False
+        self.editor.destroy()
+        self.root.quit()
+
+    def quit_click_handler(self, event):
+        self.quit()
 
     def sequencer_click_handler(self, event):
         position = event.widget.position
@@ -110,6 +122,6 @@ if __name__ == "__main__":
 
     root = Tkinter.Tk()
     root.withdraw()
-    app = SequencerController(root, wav_files_in_sample_folder, using_audio_out)
+    app = Controller(root, wav_files_in_sample_folder, using_audio_out)
     root.title("Sequencer")
     root.mainloop()
