@@ -1,4 +1,4 @@
-from sequencer_model import *
+from sequencer.model import Model, bpm_to_seconds_per_beat
 import unittest
 import time
 
@@ -14,13 +14,13 @@ class Tests(unittest.TestCase):
         self.assertAlmostEqual(2.0/3.0, bpm_to_seconds_per_beat(90.0), delta=.01)
 
     def test_toggle(self):
-        model = SequencerModel(8, 8, 120.0, 0.0, 1)
+        model = Model(8, 8, 120.0, 0.0, 1)
         result = model.toggle_button((0,0))
         self.assertTrue(result)
         self.assertTrue(model.buttons[0][0])
 
     def test_get_sample_states(self):
-        model = SequencerModel(8, 8, 120.0, 0.0, 1)
+        model = Model(8, 8, 120.0, 0.0, 1)
         for sample in range(4, 8):
             model.toggle_button((3, sample))
         states = model.get_sample_states_for_beat(3)
@@ -30,7 +30,7 @@ class Tests(unittest.TestCase):
         self.assertEquals(set([False]), set(states))
 
     def test_set_number_beats_increase(self):
-        model = SequencerModel(8, 8, 120.0, 0.0, 1)
+        model = Model(8, 8, 120.0, 0.0, 1)
         model.set_number_beats(10)
         self.assertTrue(model.number_beats == 10)
         for beat in range(10):
@@ -39,7 +39,7 @@ class Tests(unittest.TestCase):
                 self.assertFalse(model.buttons[beat][sample])
 
     def test_set_number_beats_decrease(self):
-        model = SequencerModel(8, 8, 120.0, 0.0, 1)
+        model = Model(8, 8, 120.0, 0.0, 1)
         model.set_number_beats(4)
         self.assertTrue(model.number_beats == 4)
         for beat in range(4):
@@ -48,7 +48,7 @@ class Tests(unittest.TestCase):
                 self.assertFalse(model.buttons[beat][sample])
 
     def test_set_number_beats_keep_button_states(self):
-        model = SequencerModel(8, 8, 120.0, 0.0, 1)
+        model = Model(8, 8, 120.0, 0.0, 1)
         for sample in range(4, 8):
             model.toggle_button((3, sample))
         model.set_number_beats(10)
@@ -60,7 +60,7 @@ class Tests(unittest.TestCase):
         print 'this playback timing test takes ~', TIME_FOR_ASYNC_TESTS, 'seconds'
         timing_tolerance = 0.1
         bpm = 240.0
-        model = SequencerModel(8, 8, bpm, 0.0, 1)
+        model = Model(8, 8, bpm, 0.0, 1)
         expected_beat_duration = model._calculate_beat_duration()
         step_times = []
         def assertion_callback(value):
@@ -84,7 +84,7 @@ class Tests(unittest.TestCase):
         timing_tolerance = 0.1
         first_bpm = 240.0
         second_bpm = first_bpm/2.0
-        model = SequencerModel(8, 8, first_bpm, 0.0, 1)
+        model = Model(8, 8, first_bpm, 0.0, 1)
         first_beat_duration = model._calculate_beat_duration()
         second_beat_duration = first_beat_duration * 2.0
         step_times = []
@@ -109,7 +109,7 @@ class Tests(unittest.TestCase):
         timing_tolerance = 0.1
         bpm = 240.0
         swing = .5
-        model = SequencerModel(8, 8, bpm, swing, 1)
+        model = Model(8, 8, bpm, swing, 1)
         avg_beat_duration = model._calculate_beat_duration()
         swing_delta = avg_beat_duration * swing/3.0
         step_times = []
@@ -135,7 +135,7 @@ class Tests(unittest.TestCase):
 
     def test_set_swing(self):
         swing = .5
-        model = SequencerModel(8, 8, 120.0, swing, 1)
+        model = Model(8, 8, 120.0, swing, 1)
         model.set_swing(1.1)
         self.assertAlmostEqual(model.swing, 1.0, delta=.01)
 
@@ -149,7 +149,7 @@ class Tests(unittest.TestCase):
         timing_tolerance = 1.0
         swing = 0.0
         bpm = 60.0
-        model = SequencerModel(8, 8, bpm, swing, 1)
+        model = Model(8, 8, bpm, swing, 1)
         expected_beat_duration = 1.0
         beat_duration = model._calculate_beat_duration()
         self.assertAlmostEqual(expected_beat_duration, beat_duration, delta=timing_tolerance)
@@ -161,7 +161,7 @@ class Tests(unittest.TestCase):
         timing_tolerance = 0.01
         swing = 1.0
         bpm = 60.0
-        model = SequencerModel(8, 8, bpm, swing, 1)
+        model = Model(8, 8, bpm, swing, 1)
         expected_beat_duration_downbeat = 1.0 + swing/3.0
         expected_beat_duration_upbeat = 1.0 - swing/3.0
 
@@ -175,7 +175,7 @@ class Tests(unittest.TestCase):
         timing_tolerance = 0.01
         swing = -1.0
         bpm = 60.0
-        model = SequencerModel(8, 8, bpm, swing, 1)
+        model = Model(8, 8, bpm, swing, 1)
         expected_beat_duration_downbeat = 1.0 + swing/3.0
         expected_beat_duration_upbeat = 1.0 - swing/3.0
 
@@ -190,7 +190,7 @@ class Tests(unittest.TestCase):
         timing_tolerance = 0.1
         bpm = 240.0
         columns_per_beat = 2
-        model = SequencerModel(8, 8, bpm, 0.0, columns_per_beat)
+        model = Model(8, 8, bpm, 0.0, columns_per_beat)
         expected_column_duration = model._calculate_beat_duration() / columns_per_beat
         step_times = []
         def assertion_callback(value):

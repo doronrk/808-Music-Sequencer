@@ -1,4 +1,4 @@
-from observable import *
+from sequencer.observable import Observable
 import unittest
 
 class Tests(unittest.TestCase):

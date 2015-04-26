@@ -1,13 +1,13 @@
 import threading
 import time
-from observable import *
+from observable import Observable
 
 # utility function that converts beats per minute into seconds per beat
 def bpm_to_seconds_per_beat(bpm):
     minutes_per_beat = 1.0 / bpm
     return minutes_per_beat * 60.0
 
-class SequencerModel(object):
+class Model(object):
     """This class stores the state of the sequencer"""
     
     def __init__(self, number_samples, number_beats, bpm, swing, columns_per_beat):

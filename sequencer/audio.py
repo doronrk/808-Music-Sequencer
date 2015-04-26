@@ -1,6 +1,6 @@
 import pygame
 
-class SequencerAudio(object):
+class Audio(object):
 
     def __init__(self, sample_files):
         """Outputs samples to port audio"""

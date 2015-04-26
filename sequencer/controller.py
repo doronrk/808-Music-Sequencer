@@ -1,16 +1,16 @@
 import sys
 import threading
 from os import listdir
-from sequencer_model import *
-from sequencer_editor import *
-from sequencer_console_output import *
+from model import Model
+from editor import Editor
+from console_output import ConsoleOutput
 
 DEFAULT_N_BEATS = 8
 DEFAULT_BPM = 135.0
 DEFAULT_SWING = 0.0
 DEFAULT_COLUMNS_PER_BEAT = 2.0 
 
-class SequencerController(object):
+class Controller(object):
     """The SequencerController updates the SequencerModel according to GUI events
     and updates Audio/Console output and the GUI when the current beat changes
     """
@@ -22,37 +22,37 @@ class SequencerController(object):
         using_audio_out - True if pygame dependency supported, False otherwise
         """
         
-        self.sequencer_model = SequencerModel(len(sample_files), DEFAULT_N_BEATS, DEFAULT_BPM, DEFAULT_SWING, DEFAULT_COLUMNS_PER_BEAT)
-        self.sequencer_model.current_beat.add_callback(self.beat_update_handler)
+        self.model = Model(len(sample_files), DEFAULT_N_BEATS, DEFAULT_BPM, DEFAULT_SWING, DEFAULT_COLUMNS_PER_BEAT)
+        self.model.current_beat.add_callback(self.beat_update_handler)
 
         # remove relative path and .wav from filenames
         sample_names = [sample_file[:-4].split('/', 1)[1] for sample_file in sample_files]
-        self.sequencer_editor = SequencerEditor(root, DEFAULT_N_BEATS, sample_names, DEFAULT_BPM, DEFAULT_SWING)
+        self.editor = Editor(root, DEFAULT_N_BEATS, sample_names, DEFAULT_BPM, DEFAULT_SWING)
         # binds callbacks with corresponding GUI elements 
-        self.sequencer_editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
-        self.sequencer_editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
-        self.sequencer_editor.transport_bar.bpm.bind("<Button-1>", self.bpm_setter_click_handler)
-        self.sequencer_editor.transport_bar.number_beats.bind("<Button-1>", self.number_beats_setter_click_handler)
-        self.sequencer_editor.transport_bar.swing.bind("<ButtonRelease-1>", self.swing_setter_click_handler)
-        self.sequencer_editor.sample_boxes.bind("<Button-1>", self.sample_box_click_handler)
+        self.editor.button_grid.bind("<Button-1>", self.sequencer_click_handler)
+        self.editor.transport_bar.playback_button.bind("<Button-1>", self.playback_click_handler)
+        self.editor.transport_bar.bpm.bind("<Button-1>", self.bpm_setter_click_handler)
+        self.editor.transport_bar.number_beats.bind("<Button-1>", self.number_beats_setter_click_handler)
+        self.editor.transport_bar.swing.bind("<ButtonRelease-1>", self.swing_setter_click_handler)
+        self.editor.sample_boxes.bind("<Button-1>", self.sample_box_click_handler)
         # intializes audio output if dependencies available, console output otherwise
-        self.sequencer_audio = SequencerAudio(sample_files) if using_audio_out else SequencerConsoleOutput(sample_names)
+        self.output = Audio(sample_files) if using_audio_out else ConsoleOutput(sample_names)
 
     def sequencer_click_handler(self, event):
         position = event.widget.position
-        new_state = self.sequencer_model.toggle_button(position)
-        self.sequencer_editor.set_button_state(position, new_state)
+        new_state = self.model.toggle_button(position)
+        self.editor.set_button_state(position, new_state)
 
     def playback_click_handler(self, event):
-        playback_state = self.sequencer_model.toggle_playback()
-        self.sequencer_editor.set_playback_state(playback_state)
+        playback_state = self.model.toggle_playback()
+        self.editor.set_playback_state(playback_state)
 
     def sample_box_click_handler(self, event):
         sample_number = event.widget.sample_number
-        self.sequencer_audio.play_sample(sample_number)
+        self.output.play_sample(sample_number)
 
     def bpm_setter_click_handler(self, event):
-        entry = self.sequencer_editor.transport_bar.bpm.get()
+        entry = self.editor.transport_bar.bpm.get()
         new_bpm = None
         try:
             new_bpm = float(entry)
@@ -60,10 +60,10 @@ class SequencerController(object):
             return
         if (new_bpm <= 0.0):
             return
-        self.sequencer_model.set_bpm(new_bpm)
+        self.model.set_bpm(new_bpm)
 
     def number_beats_setter_click_handler(self, event):
-        entry = self.sequencer_editor.transport_bar.number_beats.get()
+        entry = self.editor.transport_bar.number_beats.get()
         new_number_beats = None
         try:
             new_number_beats = int(entry)
@@ -71,17 +71,17 @@ class SequencerController(object):
             return
         if (new_number_beats < 1):
             return
-        self.sequencer_model.set_number_beats(new_number_beats)
-        self.sequencer_editor.set_number_beats(new_number_beats)
+        self.model.set_number_beats(new_number_beats)
+        self.editor.set_number_beats(new_number_beats)
 
     def swing_setter_click_handler(self, event):
-        value = float(self.sequencer_editor.transport_bar.swing.get())
-        self.sequencer_model.set_swing(value)
+        value = float(self.editor.transport_bar.swing.get())
+        self.model.set_swing(value)
 
     def beat_update_handler(self, current_beat):
-        self.sequencer_editor.set_current_beat(current_beat)
-        sample_states = self.sequencer_model.get_sample_states_for_beat(current_beat)
-        self.sequencer_audio.play_samples(sample_states)
+        self.editor.set_current_beat(current_beat)
+        sample_states = self.model.get_sample_states_for_beat(current_beat)
+        self.output.play_samples(sample_states)
 
 if __name__ == "__main__":
     if not len(sys.argv) == 2:
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     using_audio_out = True
     try:
-        from sequencer_audio import *
+        from audio import Audio
         print 'Pygame audio supported, outputting samples to audio out'
     except ImportError:
         using_audio_out = False

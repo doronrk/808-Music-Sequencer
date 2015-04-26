@@ -5,7 +5,7 @@ DEFAULT_TRANSPORT_DIMENSION = DEFAULT_NOTE_DIMENSION / 2.0
 OFFSET_DISTANCE = DEFAULT_NOTE_DIMENSION / 10.0
 BUTTON_TEXT_FONT_SIZE = 8
 
-class SequencerEditor(Tkinter.Toplevel):
+class Editor(Tkinter.Toplevel):
     """This is the GUI and propages click events to the SequencerController
     It consists of
         Transport Bar-  Allows the user to control the playback, bpm, and number of beats

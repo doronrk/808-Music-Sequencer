@@ -1,4 +1,4 @@
-class SequencerConsoleOutput(object):
+class ConsoleOutput(object):
 
     def __init__(self, sample_files):
         """Outputs sample names to the console"""

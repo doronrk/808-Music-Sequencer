@@ -1,10 +1,11 @@
-from sequencer_editor import *
+from sequencer.editor import Editor
 import unittest
+import Tkinter
 
 def get_editor():
     root = Tkinter.Tk()
     sample_names = [str(i) for i in range(8)]
-    return SequencerEditor(root, 8, sample_names, 120.0, 0.0)
+    return Editor(root, 8, sample_names, 120.0, 0.0)
 
 class Tests(unittest.TestCase):
 
@@ -83,7 +84,6 @@ class Tests(unittest.TestCase):
         header.set_number_beats(4)
         self.assertTrue(header_elements[0])
         self.assertEquals(set([False]), set(header_element.state for header_element in header_elements[1:]))
-
 
 
 if __name__ == '__main__':
