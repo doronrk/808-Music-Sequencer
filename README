@@ -1,9 +1,9 @@
-usage from top-: python sequencer [relative_path_to_sample_folder]
-
+usage from top-level directory: python sequencer [relative_path_to_sample_folder]
 the program will automatically load all .wav files from the sample folder
-
 for example, "python sequencer samples" directs the program to the samples folder included in the repository
+
+to run all tests from the top-level directory: python -m unittest discover
 
 audio out relies on pygame, but the program defaults to console output if pygame cannot be imported
 
-to run all tests from the top-level directory: python -m unittest discover
+instructions for installing pygame: http://webprojects.eecs.qmul.ac.uk/fa303/pgs/install.html#installpygame
